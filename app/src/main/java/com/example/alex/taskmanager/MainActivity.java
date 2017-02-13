@@ -1,10 +1,12 @@
 package com.example.alex.taskmanager;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -25,7 +27,18 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.actionAddTask:
-                Log.d(TAG, "add a new task");
+                final EditText etTask = new EditText(this);
+                AlertDialog alertDialog = new AlertDialog.Builder(this)
+                        .setTitle("New Task")
+                        .setMessage("What do you want to do?")
+                        .setView(etTask)
+                        .setPositiveButton("Add", (dialog, id) -> {
+                            String task = String.valueOf(etTask.getText());
+                            Log.d(TAG, "task to add: " + task);
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .create();
+                alertDialog.show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
