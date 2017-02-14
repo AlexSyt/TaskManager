@@ -1,20 +1,27 @@
 package com.example.alex.taskmanager;
 
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 
+import com.example.alex.taskmanager.db.TaskContract;
+import com.example.alex.taskmanager.db.TaskDbHelper;
+
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
+    private TaskDbHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        dbHelper = new TaskDbHelper(this);
     }
 
     @Override
@@ -34,7 +41,12 @@ public class MainActivity extends AppCompatActivity {
                         .setView(etTask)
                         .setPositiveButton("Add", (dialog, id) -> {
                             String task = String.valueOf(etTask.getText());
-                            Log.d(TAG, "task to add: " + task);
+                            SQLiteDatabase db = dbHelper.getWritableDatabase();
+                            ContentValues contentValues = new ContentValues();
+                            contentValues.put(TaskContract.TaskEntry.COL_TASK_TITLE, task);
+                            db.insertWithOnConflict(TaskContract.TaskEntry.TABLE, null,
+                                    contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+                            db.close();
                         })
                         .setNegativeButton("Cancel", null)
                         .create();
