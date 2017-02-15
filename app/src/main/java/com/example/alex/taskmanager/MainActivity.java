@@ -6,34 +6,32 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListView;
 
 import com.example.alex.taskmanager.db.TaskContract;
 import com.example.alex.taskmanager.db.TaskDbHelper;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private TaskDbHelper dbHelper;
+    private ListView taskListView;
+    private ArrayAdapter<String> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        taskListView = (ListView) findViewById(R.id.lvTasks);
         dbHelper = new TaskDbHelper(this);
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.query(TaskContract.TaskEntry.TABLE,
-                new String[]{TaskContract.TaskEntry._ID, TaskContract.TaskEntry.COL_TASK_TITLE},
-                null, null, null, null, null);
-        while (cursor.moveToNext()) {
-            int indx = cursor.getColumnIndex(TaskContract.TaskEntry.COL_TASK_TITLE);
-            Log.d(TAG, "Task: " + cursor.getString(indx));
-        }
-        cursor.close();
-        db.close();
+
+        updateUI();
     }
 
     @Override
@@ -59,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
                             db.insertWithOnConflict(TaskContract.TaskEntry.TABLE, null,
                                     contentValues, SQLiteDatabase.CONFLICT_REPLACE);
                             db.close();
+                            updateUI();
                         })
                         .setNegativeButton("Cancel", null)
                         .create();
@@ -67,5 +66,30 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void updateUI() {
+        ArrayList<String> taskList = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.query(TaskContract.TaskEntry.TABLE,
+                new String[]{TaskContract.TaskEntry._ID, TaskContract.TaskEntry.COL_TASK_TITLE},
+                null, null, null, null, null);
+        while (cursor.moveToNext()) {
+            int ind = cursor.getColumnIndex(TaskContract.TaskEntry.COL_TASK_TITLE);
+            taskList.add(cursor.getString(ind));
+        }
+
+        if (adapter == null) {
+            adapter = new ArrayAdapter<>(this, R.layout.lv_tasks_item,
+                    R.id.tvTaskTitle, taskList);
+            taskListView.setAdapter(adapter);
+        } else {
+            adapter.clear();
+            adapter.addAll(taskList);
+            adapter.notifyDataSetChanged();
+        }
+
+        cursor.close();
+        db.close();
     }
 }
