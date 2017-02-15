@@ -1,6 +1,7 @@
 package com.example.alex.taskmanager;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -46,24 +48,33 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.actionAddTask:
+                InputMethodManager imm = (InputMethodManager)
+                        getSystemService(Context.INPUT_METHOD_SERVICE);
                 final EditText etTask = new EditText(this);
+
                 AlertDialog alertDialog = new AlertDialog.Builder(this)
                         .setTitle("New Task")
                         .setMessage("What do you want to do?")
                         .setView(etTask)
                         .setPositiveButton("Add", (dialog, id) -> {
                             String task = String.valueOf(etTask.getText());
-                            SQLiteDatabase db = dbHelper.getWritableDatabase();
-                            ContentValues contentValues = new ContentValues();
-                            contentValues.put(TaskContract.TaskEntry.COL_TASK_TITLE, task);
-                            db.insertWithOnConflict(TaskContract.TaskEntry.TABLE, null,
-                                    contentValues, SQLiteDatabase.CONFLICT_REPLACE);
-                            db.close();
-                            updateUI();
+                            if (task.replaceAll(" ", "").length() > 0) {
+                                SQLiteDatabase db = dbHelper.getWritableDatabase();
+                                ContentValues contentValues = new ContentValues();
+                                contentValues.put(TaskContract.TaskEntry.COL_TASK_TITLE, task);
+                                db.insertWithOnConflict(TaskContract.TaskEntry.TABLE, null,
+                                        contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+                                db.close();
+                                updateUI();
+                            }
+                            imm.hideSoftInputFromWindow(etTask.getWindowToken(), 0);
                         })
-                        .setNegativeButton("Cancel", null)
+                        .setNegativeButton("Cancel", (dialog, id) ->
+                                imm.hideSoftInputFromWindow(etTask.getWindowToken(), 0))
                         .create();
                 alertDialog.show();
+
+                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
