@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">TaskManager</string>
-    <string name="tvTaskTitleText">New Task</string>
-    <string name="btnTaskDeleteText">Done</string>
-    <string name="add_task">Add Task</string>
+    <string name="tv_task_title">New Task</string>
+    <string name="btn_task_delete">Done</string>
+    <string name="action_add_task">Add Task</string>
 </resources>

@@ -22,7 +22,6 @@ import com.example.alex.taskmanager.db.TaskDbHelper;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String TAG = "MainActivity";
     private TaskDbHelper dbHelper;
     private ListView taskListView;
     private ArrayAdapter<String> adapter;
@@ -32,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        taskListView = (ListView) findViewById(R.id.lvTasks);
+        taskListView = (ListView) findViewById(R.id.lv_tasks);
         dbHelper = new TaskDbHelper(this);
 
         updateUI();
@@ -47,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.actionAddTask:
+            case R.id.action_add_task:
                 InputMethodManager imm = (InputMethodManager)
                         getSystemService(Context.INPUT_METHOD_SERVICE);
                 final EditText etTask = new EditText(this);
@@ -58,15 +57,7 @@ public class MainActivity extends AppCompatActivity {
                         .setView(etTask)
                         .setPositiveButton("Add", (dialog, id) -> {
                             String task = String.valueOf(etTask.getText());
-                            if (task.replaceAll(" ", "").length() > 0) {
-                                SQLiteDatabase db = dbHelper.getWritableDatabase();
-                                ContentValues contentValues = new ContentValues();
-                                contentValues.put(TaskContract.TaskEntry.COL_TASK_TITLE, task);
-                                db.insertWithOnConflict(TaskContract.TaskEntry.TABLE, null,
-                                        contentValues, SQLiteDatabase.CONFLICT_REPLACE);
-                                db.close();
-                                updateUI();
-                            }
+                            positiveButtonOnClick(task);
                             imm.hideSoftInputFromWindow(etTask.getWindowToken(), 0);
                         })
                         .setNegativeButton("Cancel", (dialog, id) ->
@@ -76,17 +67,30 @@ public class MainActivity extends AppCompatActivity {
 
                 imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
                 return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
+    private void positiveButtonOnClick(String task) {
+        if (task.replaceAll(" ", "").length() > 0) {
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(TaskContract.TaskEntry.TASK_COL_TITLE, task);
+            db.insertWithOnConflict(TaskContract.TaskEntry.TABLE, null,
+                    contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+            db.close();
+            updateUI();
+        }
+    }
+
     public void deleteTask(View view) {
         View parent = (View) view.getParent();
-        TextView taskTextView = (TextView) parent.findViewById(R.id.tvTaskTitle);
+        TextView taskTextView = (TextView) parent.findViewById(R.id.tv_task_title);
         String task = String.valueOf(taskTextView.getText());
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        db.delete(TaskContract.TaskEntry.TABLE, TaskContract.TaskEntry.COL_TASK_TITLE + " = ?",
+        db.delete(TaskContract.TaskEntry.TABLE, TaskContract.TaskEntry.TASK_COL_TITLE + " = ?",
                 new String[]{task});
         db.close();
         updateUI();
@@ -96,16 +100,16 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<String> taskList = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(TaskContract.TaskEntry.TABLE,
-                new String[]{TaskContract.TaskEntry._ID, TaskContract.TaskEntry.COL_TASK_TITLE},
+                new String[]{TaskContract.TaskEntry._ID, TaskContract.TaskEntry.TASK_COL_TITLE},
                 null, null, null, null, null);
         while (cursor.moveToNext()) {
-            int ind = cursor.getColumnIndex(TaskContract.TaskEntry.COL_TASK_TITLE);
+            int ind = cursor.getColumnIndex(TaskContract.TaskEntry.TASK_COL_TITLE);
             taskList.add(cursor.getString(ind));
         }
 
         if (adapter == null) {
             adapter = new ArrayAdapter<>(this, R.layout.lv_tasks_item,
-                    R.id.tvTaskTitle, taskList);
+                    R.id.tv_task_title, taskList);
             taskListView.setAdapter(adapter);
         } else {
             adapter.clear();

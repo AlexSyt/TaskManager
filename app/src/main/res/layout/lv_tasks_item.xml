@@ -5,20 +5,20 @@
     android:layout_gravity="center_vertical">
 
     <Button
-        android:id="@+id/btnTaskDelete"
+        android:id="@+id/btn_task_delete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:onClick="deleteTask"
-        android:text="@string/btnTaskDeleteText"
+        android:text="@string/btn_task_delete"
         android:textAllCaps="false" />
 
     <TextView
-        android:id="@+id/tvTaskTitle"
+        android:id="@+id/tv_task_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/btnTaskDelete"
-        android:text="@string/tvTaskTitleText"
+        android:layout_alignBaseline="@+id/btn_task_delete"
+        android:text="@string/tv_task_title"
         android:textSize="20sp" />
 </RelativeLayout>
