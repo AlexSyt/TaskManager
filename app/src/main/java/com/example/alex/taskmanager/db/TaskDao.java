@@ -29,7 +29,7 @@ public class TaskDao {
 
     public ArrayList<Task> readAllTasks() {
         tasks.clear();
-        dbHelper.getReadableDatabase();
+        db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(TaskContract.TaskEntry.TABLE,
                 new String[]{TaskContract.TaskEntry._ID, TaskContract.TaskEntry.TASK_COL_TITLE},
                 null, null, null, null, null);
