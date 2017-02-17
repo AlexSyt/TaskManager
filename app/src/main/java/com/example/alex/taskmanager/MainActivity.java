@@ -1,26 +1,26 @@
 package com.example.alex.taskmanager;
 
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 
-import com.example.alex.taskmanager.db.TaskContract;
 import com.example.alex.taskmanager.db.TaskDao;
 import com.example.alex.taskmanager.db.TaskDbHelper;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+    private static final int CM_DELETE_ID = 1;
     private TaskDbHelper dbHelper;
     private ListView taskListView;
     private TaskDao taskDao;
@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         taskListView = (ListView) findViewById(R.id.lv_tasks);
+        registerForContextMenu(taskListView);
         dbHelper = new TaskDbHelper(this);
         taskDao = new TaskDao(dbHelper);
 
@@ -78,15 +79,22 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void deleteTask(View view) {
-        View parent = (View) view.getParent();
-        TextView taskTextView = (TextView) parent.findViewById(R.id.tv_task_title);
-        String task = String.valueOf(taskTextView.getText());
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        db.delete(TaskContract.TaskEntry.TABLE, TaskContract.TaskEntry.TASK_COL_TITLE + " = ?",
-                new String[]{task});
-        db.close();
-        updateUI();
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        menu.add(0, CM_DELETE_ID, 0, "Delete");
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        if (item.getItemId() == CM_DELETE_ID) {
+            AdapterView.AdapterContextMenuInfo acmi =
+                    (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+            taskDao.deleteTask(tasks.get(acmi.position));
+            updateUI();
+            return true;
+        }
+        return super.onContextItemSelected(item);
     }
 
     private void updateUI() {
