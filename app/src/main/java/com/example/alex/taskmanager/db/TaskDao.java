@@ -48,6 +48,9 @@ public class TaskDao {
     }
 
     public void deleteTask(Task task) {
-        // in future
+        db = dbHelper.getWritableDatabase();
+        db.delete(TaskContract.TaskEntry.TABLE, TaskContract.TaskEntry._ID + " = ?",
+                new String[]{String.valueOf(task.getId())});
+        db.close();
     }
 }
