@@ -1,8 +1,6 @@
 package com.example.alex.taskmanager;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -17,6 +15,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.alex.taskmanager.db.TaskContract;
+import com.example.alex.taskmanager.db.TaskDao;
 import com.example.alex.taskmanager.db.TaskDbHelper;
 
 import java.util.ArrayList;
@@ -24,7 +23,9 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
     private TaskDbHelper dbHelper;
     private ListView taskListView;
+    private TaskDao taskDao;
     private ArrayAdapter<String> adapter;
+    private ArrayList<Task> tasks;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
 
         taskListView = (ListView) findViewById(R.id.lv_tasks);
         dbHelper = new TaskDbHelper(this);
+        taskDao = new TaskDao(dbHelper);
 
         updateUI();
     }
@@ -57,7 +59,10 @@ public class MainActivity extends AppCompatActivity {
                         .setView(etTask)
                         .setPositiveButton("Add", (dialog, id) -> {
                             String task = String.valueOf(etTask.getText());
-                            positiveButtonOnClick(task);
+                            if (task.replaceAll(" ", "").length() > 0) {
+                                taskDao.createTask(task);
+                                updateUI();
+                            }
                             imm.hideSoftInputFromWindow(etTask.getWindowToken(), 0);
                         })
                         .setNegativeButton("Cancel", (dialog, id) ->
@@ -73,18 +78,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void positiveButtonOnClick(String task) {
-        if (task.replaceAll(" ", "").length() > 0) {
-            SQLiteDatabase db = dbHelper.getWritableDatabase();
-            ContentValues contentValues = new ContentValues();
-            contentValues.put(TaskContract.TaskEntry.TASK_COL_TITLE, task);
-            db.insertWithOnConflict(TaskContract.TaskEntry.TABLE, null,
-                    contentValues, SQLiteDatabase.CONFLICT_REPLACE);
-            db.close();
-            updateUI();
-        }
-    }
-
     public void deleteTask(View view) {
         View parent = (View) view.getParent();
         TextView taskTextView = (TextView) parent.findViewById(R.id.tv_task_title);
@@ -97,15 +90,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateUI() {
+        tasks = taskDao.readAllTasks();
         ArrayList<String> taskList = new ArrayList<>();
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.query(TaskContract.TaskEntry.TABLE,
-                new String[]{TaskContract.TaskEntry._ID, TaskContract.TaskEntry.TASK_COL_TITLE},
-                null, null, null, null, null);
-        while (cursor.moveToNext()) {
-            int ind = cursor.getColumnIndex(TaskContract.TaskEntry.TASK_COL_TITLE);
-            taskList.add(cursor.getString(ind));
-        }
+        for (Task task : tasks) taskList.add(task.getText());
 
         if (adapter == null) {
             adapter = new ArrayAdapter<>(this, R.layout.lv_tasks_item,
@@ -116,8 +103,5 @@ public class MainActivity extends AppCompatActivity {
             adapter.addAll(taskList);
             adapter.notifyDataSetChanged();
         }
-
-        cursor.close();
-        db.close();
     }
 }
