@@ -21,7 +21,6 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     private static final int CM_DELETE_ID = 1;
-    private TaskDbHelper dbHelper;
     private ListView taskListView;
     private TaskDao taskDao;
     private ArrayAdapter<String> adapter;
@@ -34,8 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
         taskListView = (ListView) findViewById(R.id.lv_tasks);
         registerForContextMenu(taskListView);
-        dbHelper = new TaskDbHelper(this);
-        taskDao = new TaskDao(dbHelper);
+        taskDao = new TaskDao(new TaskDbHelper(this));
 
         updateUI();
     }

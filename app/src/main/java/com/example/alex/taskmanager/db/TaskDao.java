@@ -44,7 +44,12 @@ public class TaskDao {
     }
 
     public void updateTask(Task task) {
-        // in future
+        db = dbHelper.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(TaskContract.TaskEntry.TASK_COL_TITLE, task.getText());
+        db.update(TaskContract.TaskEntry.TABLE, contentValues, TaskContract.TaskEntry._ID + " = ?",
+                new String[]{String.valueOf(task.getId())});
+        db.close();
     }
 
     public void deleteTask(Task task) {
