@@ -9,5 +9,6 @@ public class TaskContract {
     public class TaskEntry implements BaseColumns {
         public static final String TABLE = "tasks";
         public static final String TASK_COL_TITLE = "title";
+        public static final String TASK_COL_DATE = "date";
     }
 }

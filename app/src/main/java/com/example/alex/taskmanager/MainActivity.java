@@ -17,7 +17,10 @@ import android.widget.ListView;
 import com.example.alex.taskmanager.db.TaskDao;
 import com.example.alex.taskmanager.db.TaskDbHelper;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
     private static final int CM_UPDATE_ID = 1;
@@ -60,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
                         .setPositiveButton("Add", (dialog, id) -> {
                             String task = String.valueOf(etTask.getText());
                             if (task.replaceAll(" ", "").length() > 0) {
-                                taskDao.createTask(task);
+                                taskDao.createTask(task, getDate());
                                 updateUI();
                             }
                             imm.hideSoftInputFromWindow(etTask.getWindowToken(), 0);
@@ -110,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
                             if (taskText.replaceAll(" ", "").length() > 0
                                     && !taskText.equals(task.getText())) {
                                 task.setText(taskText);
+                                task.setCreatedDate(getDate());
                                 taskDao.updateTask(task);
                                 updateUI();
                             }
@@ -131,6 +135,11 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onContextItemSelected(item);
         }
+    }
+
+    private String getDate() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM HH:mm", Locale.getDefault());
+        return dateFormat.format(new Date());
     }
 
     private void updateUI() {
