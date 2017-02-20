@@ -81,6 +81,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
+        AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) menuInfo;
+        String name = tasks.get(acmi.position).getText();
+        menu.setHeaderTitle(name);
         menu.add(0, CM_UPDATE_ID, 0, "Update");
         menu.add(0, CM_DELETE_ID, 0, "Delete");
     }
