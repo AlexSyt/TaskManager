@@ -20,7 +20,8 @@ import com.example.alex.taskmanager.db.TaskDbHelper;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    private static final int CM_DELETE_ID = 1;
+    private static final int CM_UPDATE_ID = 1;
+    private static final int CM_DELETE_ID = 2;
     private ListView taskListView;
     private TaskDao taskDao;
     private ArrayAdapter<String> adapter;
@@ -80,19 +81,53 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
+        menu.add(0, CM_UPDATE_ID, 0, "Update");
         menu.add(0, CM_DELETE_ID, 0, "Delete");
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        if (item.getItemId() == CM_DELETE_ID) {
-            AdapterView.AdapterContextMenuInfo acmi =
-                    (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-            taskDao.deleteTask(tasks.get(acmi.position));
-            updateUI();
-            return true;
+        AdapterView.AdapterContextMenuInfo acmi =
+                (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+
+        switch (item.getItemId()) {
+            case CM_UPDATE_ID:
+                InputMethodManager imm = (InputMethodManager)
+                        getSystemService(Context.INPUT_METHOD_SERVICE);
+                Task task = tasks.get(acmi.position);
+                final EditText etTask = new EditText(this);
+                etTask.setText(task.getText());
+                etTask.setSelection(etTask.getText().length());
+
+                AlertDialog alertDialog = new AlertDialog.Builder(this)
+                        .setTitle("Update Task")
+                        .setView(etTask)
+                        .setPositiveButton("Update", (dialog, id) -> {
+                            String taskText = String.valueOf(etTask.getText());
+                            if (taskText.replaceAll(" ", "").length() > 0
+                                    && !taskText.equals(task.getText())) {
+                                task.setText(taskText);
+                                taskDao.updateTask(task);
+                                updateUI();
+                            }
+                            imm.hideSoftInputFromWindow(etTask.getWindowToken(), 0);
+                        })
+                        .setNegativeButton("Cancel", (dialog, id) ->
+                                imm.hideSoftInputFromWindow(etTask.getWindowToken(), 0))
+                        .create();
+                alertDialog.show();
+
+                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+                return true;
+
+            case CM_DELETE_ID:
+                taskDao.deleteTask(tasks.get(acmi.position));
+                updateUI();
+                return true;
+
+            default:
+                return super.onContextItemSelected(item);
         }
-        return super.onContextItemSelected(item);
     }
 
     private void updateUI() {
