@@ -10,9 +10,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 
 import com.example.alex.taskmanager.db.TaskDao;
 import com.example.alex.taskmanager.db.TaskDbHelper;
@@ -20,15 +20,18 @@ import com.example.alex.taskmanager.db.TaskDbHelper;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     private static final int CM_UPDATE_ID = 1;
     private static final int CM_DELETE_ID = 2;
     private ListView taskListView;
     private TaskDao taskDao;
-    private ArrayAdapter<String> adapter;
+    private SimpleAdapter adapter;
     private ArrayList<Task> tasks;
+    private ArrayList<Map<String, String>> data;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
         taskListView = (ListView) findViewById(R.id.lv_tasks);
         registerForContextMenu(taskListView);
         taskDao = new TaskDao(new TaskDbHelper(this));
+        data = new ArrayList<>();
 
         updateUI();
     }
@@ -144,17 +148,31 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateUI() {
         tasks = taskDao.readAllTasks();
-        ArrayList<String> taskList = new ArrayList<>();
-        for (Task task : tasks) taskList.add(task.getText());
+        ArrayList<String> taskTextList = new ArrayList<>();
+        ArrayList<String> taskDateList = new ArrayList<>();
+        for (Task task : tasks) {
+            taskTextList.add(task.getText());
+            taskDateList.add(task.getCreatedDate().replace(" ", "\n"));
+        }
+
+        final String ATTRIBUTE_NAME_TEXT = "text";
+        final String ATTRIBUTE_NAME_DATE = "date";
+
+        data.clear();
+        Map<String, String> map;
+        for (int i = 0; i < tasks.size(); i++) {
+            map = new HashMap<>();
+            map.put(ATTRIBUTE_NAME_TEXT, taskTextList.get(i));
+            map.put(ATTRIBUTE_NAME_DATE, taskDateList.get(i));
+            data.add(map);
+        }
+
+        String[] from = {ATTRIBUTE_NAME_TEXT, ATTRIBUTE_NAME_DATE};
+        int[] to = {R.id.tv_task_title, R.id.tv_task_date};
 
         if (adapter == null) {
-            adapter = new ArrayAdapter<>(this, R.layout.lv_tasks_item,
-                    R.id.tv_task_title, taskList);
+            adapter = new SimpleAdapter(this, data, R.layout.lv_tasks_item, from, to);
             taskListView.setAdapter(adapter);
-        } else {
-            adapter.clear();
-            adapter.addAll(taskList);
-            adapter.notifyDataSetChanged();
-        }
+        } else adapter.notifyDataSetChanged();
     }
 }
