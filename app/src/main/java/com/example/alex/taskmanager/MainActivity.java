@@ -164,8 +164,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private SimpleAdapter adapter;
-    final String ATTRIBUTE_NAME_TEXT = "text";
-    final String ATTRIBUTE_NAME_DATE = "date";
 
     private void updateUI() {
         ArrayList<String> taskTextList = new ArrayList<>();
@@ -177,6 +175,8 @@ public class MainActivity extends AppCompatActivity {
 
         data.clear();
         Map<String, String> map;
+        String ATTRIBUTE_NAME_TEXT = "text";
+        String ATTRIBUTE_NAME_DATE = "date";
         for (int i = 0; i < tasks.size(); i++) {
             map = new HashMap<>();
             map.put(ATTRIBUTE_NAME_TEXT, taskTextList.get(i));

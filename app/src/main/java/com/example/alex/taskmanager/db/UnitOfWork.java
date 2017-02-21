@@ -27,8 +27,7 @@ public class UnitOfWork {
     }
 
     public void delete(Task task) {
-        if (create.contains(task))
-            create.remove(task);
+        if (create.contains(task)) create.remove(task);
         else delete.add(task);
     }
 

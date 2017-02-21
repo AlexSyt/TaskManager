@@ -9,8 +9,8 @@ import com.example.alex.taskmanager.Task;
 import java.util.ArrayList;
 
 public class TaskDao {
-    private TaskDbHelper dbHelper;
-    private ArrayList<Task> tasks;
+    private final TaskDbHelper dbHelper;
+    private final ArrayList<Task> tasks;
     private SQLiteDatabase db;
 
     public TaskDao(TaskDbHelper dbHelper) {
