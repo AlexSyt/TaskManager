@@ -16,6 +16,7 @@ import android.widget.SimpleAdapter;
 
 import com.example.alex.taskmanager.db.TaskDao;
 import com.example.alex.taskmanager.db.TaskDbHelper;
+import com.example.alex.taskmanager.db.UnitOfWork;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -25,13 +26,11 @@ import java.util.Locale;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
-    private static final int CM_UPDATE_ID = 1;
-    private static final int CM_DELETE_ID = 2;
     private ListView taskListView;
     private TaskDao taskDao;
-    private SimpleAdapter adapter;
     private ArrayList<Task> tasks;
     private ArrayList<Map<String, String>> data;
+    private UnitOfWork unitOfWork;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,9 +40,21 @@ public class MainActivity extends AppCompatActivity {
         taskListView = (ListView) findViewById(R.id.lv_tasks);
         registerForContextMenu(taskListView);
         taskDao = new TaskDao(new TaskDbHelper(this));
+        unitOfWork = new UnitOfWork(taskDao);
         data = new ArrayList<>();
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        tasks = taskDao.readAll();
         updateUI();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unitOfWork.commit();
     }
 
     @Override
@@ -65,9 +76,11 @@ public class MainActivity extends AppCompatActivity {
                         .setMessage("What do you want to do?")
                         .setView(etTask)
                         .setPositiveButton("Add", (dialog, id) -> {
-                            String task = String.valueOf(etTask.getText());
-                            if (task.replaceAll(" ", "").length() > 0) {
-                                taskDao.createTask(task, getDate());
+                            String taskText = String.valueOf(etTask.getText());
+                            if (taskText.replaceAll(" ", "").length() > 0) {
+                                Task task = new Task(taskText, getDate());
+                                unitOfWork.create(task);
+                                tasks.add(task);
                                 updateUI();
                             }
                             imm.hideSoftInputFromWindow(etTask.getWindowToken(), 0);
@@ -84,6 +97,9 @@ public class MainActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    private static final int CM_UPDATE_ID = 1;
+    private static final int CM_DELETE_ID = 2;
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
@@ -118,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
                                     && !taskText.equals(task.getText())) {
                                 task.setText(taskText);
                                 task.setCreatedDate(getDate());
-                                taskDao.updateTask(task);
+                                unitOfWork.update(task);
                                 updateUI();
                             }
                             imm.hideSoftInputFromWindow(etTask.getWindowToken(), 0);
@@ -132,7 +148,8 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case CM_DELETE_ID:
-                taskDao.deleteTask(tasks.get(acmi.position));
+                unitOfWork.delete(tasks.get(acmi.position));
+                tasks.remove(acmi.position);
                 updateUI();
                 return true;
 
@@ -146,17 +163,17 @@ public class MainActivity extends AppCompatActivity {
         return dateFormat.format(new Date());
     }
 
+    private SimpleAdapter adapter;
+    final String ATTRIBUTE_NAME_TEXT = "text";
+    final String ATTRIBUTE_NAME_DATE = "date";
+
     private void updateUI() {
-        tasks = taskDao.readAllTasks();
         ArrayList<String> taskTextList = new ArrayList<>();
         ArrayList<String> taskDateList = new ArrayList<>();
         for (Task task : tasks) {
             taskTextList.add(task.getText());
             taskDateList.add(task.getCreatedDate().replace(" ", "\n"));
         }
-
-        final String ATTRIBUTE_NAME_TEXT = "text";
-        final String ATTRIBUTE_NAME_DATE = "date";
 
         data.clear();
         Map<String, String> map;

@@ -18,17 +18,17 @@ public class TaskDao {
         tasks = new ArrayList<>();
     }
 
-    public void createTask(String task, String date) {
+    public void create(Task task) {
         db = dbHelper.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put(TaskContract.TaskEntry.TASK_COL_TITLE, task);
-        contentValues.put(TaskContract.TaskEntry.TASK_COL_DATE, date);
+        contentValues.put(TaskContract.TaskEntry.TASK_COL_TITLE, task.getText());
+        contentValues.put(TaskContract.TaskEntry.TASK_COL_DATE, task.getCreatedDate());
         db.insertWithOnConflict(TaskContract.TaskEntry.TABLE, null,
                 contentValues, SQLiteDatabase.CONFLICT_REPLACE);
         db.close();
     }
 
-    public ArrayList<Task> readAllTasks() {
+    public ArrayList<Task> readAll() {
         tasks.clear();
         db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(TaskContract.TaskEntry.TABLE,
@@ -47,7 +47,7 @@ public class TaskDao {
         return tasks;
     }
 
-    public void updateTask(Task task) {
+    public void update(Task task) {
         db = dbHelper.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(TaskContract.TaskEntry.TASK_COL_TITLE, task.getText());
@@ -57,7 +57,7 @@ public class TaskDao {
         db.close();
     }
 
-    public void deleteTask(Task task) {
+    public void delete(Task task) {
         db = dbHelper.getWritableDatabase();
         db.delete(TaskContract.TaskEntry.TABLE, TaskContract.TaskEntry._ID + " = ?",
                 new String[]{String.valueOf(task.getId())});

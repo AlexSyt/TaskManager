@@ -11,6 +11,11 @@ public class Task {
         this.createdDate = createdDate;
     }
 
+    public Task(String text, String createdDate) {
+        this.text = text;
+        this.createdDate = createdDate;
+    }
+
     public long getId() {
         return id;
     }
