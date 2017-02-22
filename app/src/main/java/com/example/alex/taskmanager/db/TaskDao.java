@@ -11,7 +11,6 @@ import java.util.ArrayList;
 public class TaskDao {
     private final TaskDbHelper dbHelper;
     private final ArrayList<Task> tasks;
-    private SQLiteDatabase db;
 
     public TaskDao(TaskDbHelper dbHelper) {
         this.dbHelper = dbHelper;
@@ -19,7 +18,7 @@ public class TaskDao {
     }
 
     public void create(Task task) {
-        db = dbHelper.getWritableDatabase();
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(TaskContract.TaskEntry.TASK_COL_TITLE, task.getText());
         contentValues.put(TaskContract.TaskEntry.TASK_COL_DATE, task.getCreatedDate());
@@ -30,17 +29,13 @@ public class TaskDao {
 
     public ArrayList<Task> readAll() {
         tasks.clear();
-        db = dbHelper.getReadableDatabase();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(TaskContract.TaskEntry.TABLE,
                 new String[]{TaskContract.TaskEntry._ID, TaskContract.TaskEntry.TASK_COL_TITLE,
                         TaskContract.TaskEntry.TASK_COL_DATE},
                 null, null, null, null, null);
         while (cursor.moveToNext()) {
-            int taskIdInd = cursor.getColumnIndex(TaskContract.TaskEntry._ID);
-            int taskTextInd = cursor.getColumnIndex(TaskContract.TaskEntry.TASK_COL_TITLE);
-            int taskDateInd = cursor.getColumnIndex(TaskContract.TaskEntry.TASK_COL_DATE);
-            tasks.add(new Task(cursor.getLong(taskIdInd), cursor.getString(taskTextInd),
-                    cursor.getString(taskDateInd)));
+            tasks.add(new Task(cursor.getLong(0), cursor.getString(1), cursor.getString(2)));
         }
         cursor.close();
         db.close();
@@ -48,7 +43,7 @@ public class TaskDao {
     }
 
     public void update(Task task) {
-        db = dbHelper.getWritableDatabase();
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(TaskContract.TaskEntry.TASK_COL_TITLE, task.getText());
         contentValues.put(TaskContract.TaskEntry.TASK_COL_DATE, task.getCreatedDate());
@@ -58,7 +53,7 @@ public class TaskDao {
     }
 
     public void delete(Task task) {
-        db = dbHelper.getWritableDatabase();
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.delete(TaskContract.TaskEntry.TABLE, TaskContract.TaskEntry._ID + " = ?",
                 new String[]{String.valueOf(task.getId())});
         db.close();
