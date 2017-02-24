@@ -8,19 +8,20 @@
 
     <TextView
         android:id="@+id/tv_task_title"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:layout_weight="0.15"
+        android:layout_weight="0.82"
         android:focusable="false"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <TextView
         android:id="@+id/tv_task_date"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="0.85"
+        android:layout_weight="0.18"
         android:focusable="false"
+        android:gravity="end"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textSize="18sp" />
 </LinearLayout>
