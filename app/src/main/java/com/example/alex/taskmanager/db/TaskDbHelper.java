@@ -7,22 +7,22 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class TaskDbHelper extends SQLiteOpenHelper {
     public TaskDbHelper(Context context) {
-        super(context, TaskContract.DB_NAME, null, TaskContract.DB_VERSION);
+        super(context, DbContract.DB_NAME, null, DbContract.DB_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        String createTable = "CREATE TABLE " + TaskContract.TaskEntry.TABLE + " ( " +
-                TaskContract.TaskEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                TaskContract.TaskEntry.TASK_COL_TITLE + " TEXT NOT NULL, " +
-                TaskContract.TaskEntry.TASK_COL_DATE + " TEXT NOT NULL);";
+        String createTable = "CREATE TABLE " + DbContract.TaskEntry.TABLE + " ( " +
+                DbContract.TaskEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                DbContract.TaskEntry.COL_TITLE + " TEXT NOT NULL, " +
+                DbContract.TaskEntry.COL_DATE + " TEXT NOT NULL);";
 
         sqLiteDatabase.execSQL(createTable);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TaskContract.TaskEntry.TABLE);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + DbContract.TaskEntry.TABLE);
         onCreate(sqLiteDatabase);
     }
 }
