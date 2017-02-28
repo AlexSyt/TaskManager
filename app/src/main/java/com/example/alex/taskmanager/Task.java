@@ -1,22 +1,25 @@
 package com.example.alex.taskmanager;
 
+import java.util.UUID;
+
 public class Task {
-    private long id = -1;
+    private UUID id;
     private String text;
     private String createdDate;
 
-    public Task(long id, String text, String createdDate) {
+    public Task(UUID id, String text, String createdDate) {
         this.id = id;
         this.text = text;
         this.createdDate = createdDate;
     }
 
     public Task(String text, String createdDate) {
+        id = UUID.randomUUID();
         this.text = text;
         this.createdDate = createdDate;
     }
 
-    public long getId() {
+    public UUID getId() {
         return id;
     }
 

@@ -47,11 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
         taskListView.setOnItemClickListener((parent, view, position, id) -> {
             Intent intent = new Intent(this, SubitemsActivity.class);
-            if (tasks.get(position).getId() == -1) {
-                unitOfWork.commit();
-                tasks = taskDao.readAll();
-            }
-            intent.putExtra(DbSchema.SubTaskEntry.PARENT_ID, tasks.get(position).getId());
+            intent.putExtra(DbSchema.SubTaskEntry.PARENT_ID, tasks.get(position).getId().toString());
             startActivity(intent);
         });
     }
@@ -91,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
                             String taskText = String.valueOf(etTask.getText());
                             if (taskText.replaceAll(" ", "").length() > 0) {
                                 Task task = new Task(taskText, getDate());
-                                unitOfWork.create(task);
+                                unitOfWork.registerNew(task);
                                 tasks.add(task);
                                 updateUI();
                             }
@@ -146,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
                                     && !taskText.equals(task.getText())) {
                                 task.setText(taskText);
                                 task.setCreatedDate(getDate());
-                                unitOfWork.update(task);
+                                unitOfWork.registerDirty(task);
                                 updateUI();
                             }
                             imm.hideSoftInputFromWindow(etTask.getWindowToken(), 0);
@@ -160,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case CM_DELETE_ID:
-                unitOfWork.delete(tasks.get(acmi.position));
+                unitOfWork.registerDeleted(tasks.get(acmi.position));
                 tasks.remove(acmi.position);
                 updateUI();
                 return true;

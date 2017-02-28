@@ -7,36 +7,36 @@ import java.util.List;
 
 public class UnitOfWork {
     private final TaskDao taskDao;
-    private final List<Task> create;
-    private final List<Task> update;
-    private final List<Task> delete;
+    private final List<Task> registeredForCreate;
+    private final List<Task> registeredForUpdate;
+    private final List<Task> registeredForDelete;
 
     public UnitOfWork(TaskDao taskDao) {
         this.taskDao = taskDao;
-        create = new ArrayList<>();
-        update = new ArrayList<>();
-        delete = new ArrayList<>();
+        registeredForCreate = new ArrayList<>();
+        registeredForUpdate = new ArrayList<>();
+        registeredForDelete = new ArrayList<>();
     }
 
-    public void create(Task task) {
-        create.add(task);
+    public void registerNew(Task task) {
+        registeredForCreate.add(task);
     }
 
-    public void update(Task task) {
-        update.add(task);
+    public void registerDirty(Task task) {
+        registeredForUpdate.add(task);
     }
 
-    public void delete(Task task) {
-        if (create.contains(task)) create.remove(task);
-        else delete.add(task);
+    public void registerDeleted(Task task) {
+        if (registeredForCreate.contains(task)) registeredForCreate.remove(task);
+        else registeredForDelete.add(task);
     }
 
     public void commit() {
-        for (Task task : delete) taskDao.delete(task);
-        for (Task task : create) taskDao.create(task);
-        for (Task task : update) taskDao.update(task);
-        create.clear();
-        update.clear();
-        delete.clear();
+        for (Task task : registeredForCreate) taskDao.create(task);
+        for (Task task : registeredForUpdate) taskDao.update(task);
+        for (Task task : registeredForDelete) taskDao.delete(task);
+        registeredForCreate.clear();
+        registeredForUpdate.clear();
+        registeredForDelete.clear();
     }
 }

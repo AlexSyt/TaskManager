@@ -13,7 +13,7 @@ public class TaskDbHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         String createTableTask = "CREATE TABLE " + DbSchema.TaskEntry.TABLE + " ( " +
-                DbSchema.TaskEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                DbSchema.TaskEntry._ID + " TEXT NOT NULL PRIMARY KEY, " +
                 DbSchema.TaskEntry.TITLE + " TEXT NOT NULL, " +
                 DbSchema.TaskEntry.DATE + " TEXT NOT NULL);";
 
