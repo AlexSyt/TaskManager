@@ -13,10 +13,10 @@ import java.util.UUID;
 
 @SuppressLint("NewApi")
 public class TaskDao {
-    private final TaskDbHelper dbHelper;
+    private final DbHelper dbHelper;
     private final ArrayList<Task> tasks;
 
-    public TaskDao(TaskDbHelper dbHelper) {
+    public TaskDao(DbHelper dbHelper) {
         this.dbHelper = dbHelper;
         tasks = new ArrayList<>();
     }

@@ -5,8 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 
-public class TaskDbHelper extends SQLiteOpenHelper {
-    public TaskDbHelper(Context context) {
+public class DbHelper extends SQLiteOpenHelper {
+    public DbHelper(Context context) {
         super(context, DbSchema.DB_NAME, null, DbSchema.DB_VERSION);
     }
 

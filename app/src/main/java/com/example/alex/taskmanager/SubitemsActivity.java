@@ -3,7 +3,6 @@ package com.example.alex.taskmanager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import com.example.alex.taskmanager.db.DbSchema;
 
@@ -15,6 +14,5 @@ public class SubitemsActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         String parentId = intent.getStringExtra(DbSchema.SubTaskEntry.PARENT_ID);
-        Log.d("kek", parentId);
     }
 }

@@ -17,7 +17,7 @@ import android.widget.SimpleAdapter;
 
 import com.example.alex.taskmanager.db.DbSchema;
 import com.example.alex.taskmanager.db.TaskDao;
-import com.example.alex.taskmanager.db.TaskDbHelper;
+import com.example.alex.taskmanager.db.DbHelper;
 import com.example.alex.taskmanager.db.UnitOfWork;
 
 import java.text.SimpleDateFormat;
@@ -28,7 +28,7 @@ import java.util.Locale;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
-    private ListView taskListView;
+    private ListView lvTasks;
     private TaskDao taskDao;
     private ArrayList<Task> tasks;
     private ArrayList<Map<String, String>> data;
@@ -39,13 +39,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lv);
 
-        taskListView = (ListView) findViewById(R.id.lv_tasks);
-        registerForContextMenu(taskListView);
-        taskDao = new TaskDao(new TaskDbHelper(this));
+        lvTasks = (ListView) findViewById(R.id.lv_tasks);
+        registerForContextMenu(lvTasks);
+        taskDao = new TaskDao(new DbHelper(this));
         unitOfWork = new UnitOfWork(taskDao);
         data = new ArrayList<>();
 
-        taskListView.setOnItemClickListener((parent, view, position, id) -> {
+        lvTasks.setOnItemClickListener((parent, view, position, id) -> {
             Intent intent = new Intent(this, SubitemsActivity.class);
             intent.putExtra(DbSchema.SubTaskEntry.PARENT_ID, tasks.get(position).getId().toString());
             startActivity(intent);
@@ -197,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (adapter == null) {
             adapter = new SimpleAdapter(this, data, R.layout.lv_tasks_item, from, to);
-            taskListView.setAdapter(adapter);
+            lvTasks.setAdapter(adapter);
         } else adapter.notifyDataSetChanged();
     }
 }
