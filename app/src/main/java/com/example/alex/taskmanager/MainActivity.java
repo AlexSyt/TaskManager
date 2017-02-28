@@ -15,9 +15,9 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
+import com.example.alex.taskmanager.db.DbHelper;
 import com.example.alex.taskmanager.db.DbSchema;
 import com.example.alex.taskmanager.db.TaskDao;
-import com.example.alex.taskmanager.db.DbHelper;
 import com.example.alex.taskmanager.db.UnitOfWork;
 
 import java.text.SimpleDateFormat;

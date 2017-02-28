@@ -20,7 +20,7 @@ public class DbHelper extends SQLiteOpenHelper {
         String createTableSubtasks = "CREATE TABLE " + DbSchema.SubTaskEntry.TABLE + " ( " +
                 DbSchema.SubTaskEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 DbSchema.SubTaskEntry.TITLE + " TEXT NOT NULL, " +
-                DbSchema.SubTaskEntry.PARENT_ID + " INTEGER NOT NULL, FOREIGN KEY (" +
+                DbSchema.SubTaskEntry.PARENT_ID + " TEXT NOT NULL, FOREIGN KEY (" +
                 DbSchema.SubTaskEntry.PARENT_ID + ") REFERENCES " +
                 DbSchema.TaskEntry.TABLE + "(" + DbSchema.TaskEntry._ID + ") ON DELETE CASCADE);";
 

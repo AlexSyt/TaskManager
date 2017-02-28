@@ -23,11 +23,11 @@ public class TaskDao {
 
     public void create(Task task) {
         try (SQLiteDatabase db = dbHelper.getWritableDatabase()) {
-            ContentValues contentValues = new ContentValues();
-            contentValues.put(TaskEntry._ID, task.getId().toString());
-            contentValues.put(TaskEntry.TITLE, task.getText());
-            contentValues.put(TaskEntry.DATE, task.getCreatedDate());
-            db.insert(TaskEntry.TABLE, null, contentValues);
+            ContentValues cv = new ContentValues();
+            cv.put(TaskEntry._ID, task.getId().toString());
+            cv.put(TaskEntry.TITLE, task.getText());
+            cv.put(TaskEntry.DATE, task.getCreatedDate());
+            db.insert(TaskEntry.TABLE, null, cv);
         }
     }
 
@@ -36,7 +36,8 @@ public class TaskDao {
              Cursor cursor = db.query(TaskEntry.TABLE, null, null, null, null, null, null)) {
             tasks.clear();
             while (cursor.moveToNext()) {
-                tasks.add(new Task(UUID.fromString(cursor.getString(0)), cursor.getString(1), cursor.getString(2)));
+                tasks.add(new Task(UUID.fromString(cursor.getString(0)), cursor.getString(1),
+                        cursor.getString(2)));
             }
             return tasks;
         }
@@ -44,10 +45,10 @@ public class TaskDao {
 
     public void update(Task task) {
         try (SQLiteDatabase db = dbHelper.getWritableDatabase()) {
-            ContentValues contentValues = new ContentValues();
-            contentValues.put(TaskEntry.TITLE, task.getText());
-            contentValues.put(TaskEntry.DATE, task.getCreatedDate());
-            db.update(TaskEntry.TABLE, contentValues, TaskEntry._ID + " = ?",
+            ContentValues cv = new ContentValues();
+            cv.put(TaskEntry.TITLE, task.getText());
+            cv.put(TaskEntry.DATE, task.getCreatedDate());
+            db.update(TaskEntry.TABLE, cv, TaskEntry._ID + " = ?",
                     new String[]{String.valueOf(task.getId())});
         }
     }
