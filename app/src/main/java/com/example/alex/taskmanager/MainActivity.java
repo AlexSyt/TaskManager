@@ -1,6 +1,7 @@
 package com.example.alex.taskmanager;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +15,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
+import com.example.alex.taskmanager.db.DbSchema;
 import com.example.alex.taskmanager.db.TaskDao;
 import com.example.alex.taskmanager.db.TaskDbHelper;
 import com.example.alex.taskmanager.db.UnitOfWork;
@@ -35,13 +37,23 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_lv);
 
         taskListView = (ListView) findViewById(R.id.lv_tasks);
         registerForContextMenu(taskListView);
         taskDao = new TaskDao(new TaskDbHelper(this));
         unitOfWork = new UnitOfWork(taskDao);
         data = new ArrayList<>();
+
+        taskListView.setOnItemClickListener((parent, view, position, id) -> {
+            Intent intent = new Intent(this, SubitemsActivity.class);
+            if (tasks.get(position).getId() == -1) {
+                unitOfWork.commit();
+                tasks = taskDao.readAll();
+            }
+            intent.putExtra(DbSchema.SubTaskEntry.PARENT_ID, tasks.get(position).getId());
+            startActivity(intent);
+        });
     }
 
     @Override

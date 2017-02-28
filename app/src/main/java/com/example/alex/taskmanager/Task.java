@@ -1,7 +1,7 @@
 package com.example.alex.taskmanager;
 
 public class Task {
-    private long id;
+    private long id = -1;
     private String text;
     private String createdDate;
 
