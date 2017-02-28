@@ -6,7 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.example.alex.taskmanager.Task;
-import com.example.alex.taskmanager.db.DbContract.TaskEntry;
+import com.example.alex.taskmanager.db.DbSchema.TaskEntry;
 
 import java.util.ArrayList;
 
@@ -23,8 +23,8 @@ public class TaskDao {
     public void create(Task task) {
         try (SQLiteDatabase db = dbHelper.getWritableDatabase()) {
             ContentValues contentValues = new ContentValues();
-            contentValues.put(TaskEntry.COL_TITLE, task.getText());
-            contentValues.put(TaskEntry.COL_DATE, task.getCreatedDate());
+            contentValues.put(TaskEntry.TITLE, task.getText());
+            contentValues.put(TaskEntry.DATE, task.getCreatedDate());
             db.insert(TaskEntry.TABLE, null, contentValues);
         }
     }
@@ -43,8 +43,8 @@ public class TaskDao {
     public void update(Task task) {
         try (SQLiteDatabase db = dbHelper.getWritableDatabase()) {
             ContentValues contentValues = new ContentValues();
-            contentValues.put(TaskEntry.COL_TITLE, task.getText());
-            contentValues.put(TaskEntry.COL_DATE, task.getCreatedDate());
+            contentValues.put(TaskEntry.TITLE, task.getText());
+            contentValues.put(TaskEntry.DATE, task.getCreatedDate());
             db.update(TaskEntry.TABLE, contentValues, TaskEntry._ID + " = ?",
                     new String[]{String.valueOf(task.getId())});
         }
