@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
         lvTasks.setOnItemClickListener((parent, view, position, id) -> {
             Intent intent = new Intent(this, SubitemsActivity.class);
             intent.putExtra(DbSchema.SubTaskEntry.PARENT_ID, tasks.get(position).getId().toString());
+            intent.putExtra(DbSchema.TaskEntry.TITLE, tasks.get(position).getText());
             startActivity(intent);
         });
     }
