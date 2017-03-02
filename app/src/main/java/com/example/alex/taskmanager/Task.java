@@ -3,7 +3,7 @@ package com.example.alex.taskmanager;
 import java.util.UUID;
 
 public class Task {
-    private UUID id;
+    private final UUID id;
     private String text;
     private String createdDate;
 
